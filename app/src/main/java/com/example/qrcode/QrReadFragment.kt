@@ -1,15 +1,17 @@
 package com.example.qrcode
 
-import android.content.pm.PackageManager
-import android.os.Build
+
+import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.webkit.WebSettings
+import android.webkit.WebViewClient
+import androidx.fragment.app.Fragment
 import com.example.qrcode.databinding.FragmentQrReadBinding
-import com.google.zxing.BarcodeFormat
+import com.google.zxing.integration.android.IntentIntegrator
 
 
 class QrReadFragment : Fragment() {
@@ -17,8 +19,12 @@ class QrReadFragment : Fragment() {
     private var _binding: FragmentQrReadBinding? = null
     private val binding get() = _binding!!
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,34 +38,32 @@ class QrReadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         setScannerProperties()
+
+        (requireActivity() as MainActivity).qrReader{
+            binding.webView.webViewClient = WebViewClient()
+            binding.webView.loadUrl(it)
+        }
 
 
     }
 
     private fun setScannerProperties() {
-        binding.apply {
-            qrCodeScanner.setFormats(listOf(BarcodeFormat.QR_CODE))
-            qrCodeScanner.setAutoFocus(true)
-            qrCodeScanner.setLaserColor(R.color.white)
-            qrCodeScanner.setMaskColor(R.color.black)
-            if (Build.MANUFACTURER.equals(HUAWEI, ignoreCase = true))
-                qrCodeScanner.setAspectTolerance(0.5f)
-        }
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(requireContext(),Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION),
-                    MY_CAMERA_REQUEST_CODE)
-                return
+        binding.button.setOnClickListener {
+            IntentIntegrator(requireActivity()).apply {
+                setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+                setPrompt("")
+                setCameraId(0)
+                setOrientationLocked(false)
+                initiateScan()
             }
         }
-        qrCodeScanner.startCamera()
-        qrCodeScanner.setResultHandler(this)
+    }
+
+
+    companion object {
+        const val EXTRA_REPLY = "com.example.android.qrreader.REPLY"
     }
 
 

@@ -6,15 +6,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".QrShowFragment">
 
-    <me.dm7.barcodescanner.zxing.ZXingScannerView
-        android:id="@+id/qrCodeScanner"
+    <WebView
+        android:id="@+id/web_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button"
+        android:layout_weight="1"/>
 
-        />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="11"
+        android:text="Check QR code"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/web_view"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
